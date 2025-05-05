@@ -1,23 +1,23 @@
-﻿namespace AgentCommunicationProtocol.Requests;
+﻿namespace AgentCommunicationProtocol.Queries.Runs;
 
 /// <summary>
-/// Represents the request used to search for runs.
+/// Represents the query used to search for runs.
 /// </summary>
-[Description("Represents the request used to search for runs.")]
+[Description("Represents the query used to search for runs.")]
 [DataContract]
-public record SearchRunRequest
+public record SearchRunQuery
 {
 
     /// <summary>
-    /// Gets the minium amount of runs that can be returned by a search request.
+    /// Gets the minimum amount of runs that can be returned by a search query.
     /// </summary>
     public const int MinimumLimit = 1;
     /// <summary>
-    /// Gets the maximum amount of runs that can be returned by a search request.
+    /// Gets the maximum amount of runs that can be returned by a search query.
     /// </summary>
     public const int MaximumLimit = 1000;
     /// <summary>
-    /// Gets the default amount of runs returned by a search request.
+    /// Gets the default amount of runs returned by a search query.
     /// </summary>
     public const int DefaultLimit = 10;
 
@@ -32,7 +32,7 @@ public record SearchRunRequest
     /// Gets/sets the status, if any, to filter runs by.
     /// </summary>
     [Description("The status, if any, to filter runs by.")]
-    [AllowedValues(RunStatus.Error, RunStatus.Interrupted, RunStatus.Pending, RunStatus.Success, RunStatus.Timeout)]
+    [AllowedValues(null, RunStatus.Error, RunStatus.Interrupted, RunStatus.Pending, RunStatus.Success, RunStatus.Timeout)]
     [DataMember(Name = "status", Order = 2), JsonPropertyName("status"), JsonPropertyOrder(2), YamlMember(Alias = "status", Order = 2)]
     public virtual string? Status { get; set; }
 
@@ -56,6 +56,6 @@ public record SearchRunRequest
     /// </summary>
     [Description("The offset to start listing runs from. Defaults to '0'.")]
     [DataMember(Name = "offset", Order = 5), JsonPropertyName("offset"), JsonPropertyOrder(5), YamlMember(Alias = "offset", Order = 54)]
-    public virtual uint Offset { get; set; } = DefaultLimit;
+    public virtual uint Offset { get; set; }
 
 }

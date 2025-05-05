@@ -1,5 +1,7 @@
-﻿global using Json.Schema;
+﻿global using AgentCommunicationProtocol.Models;
+global using Json.Schema;
 global using Neuroglia;
+global using Neuroglia.Mediation;
 global using System.ComponentModel;
 global using System.ComponentModel.DataAnnotations;
 global using System.Runtime.Serialization;

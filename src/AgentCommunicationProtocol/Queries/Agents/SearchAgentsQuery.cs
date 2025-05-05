@@ -1,23 +1,24 @@
-﻿namespace AgentCommunicationProtocol.Requests;
+﻿namespace AgentCommunicationProtocol.Queries.Agents;
 
 /// <summary>
-/// Represents the request used to search for agents.
+/// Represents the query used to search for agents.
 /// </summary>
-[Description("Represents the request used to search for agents.")]
+[Description("Represents the query used to search for agents.")]
 [DataContract]
-public record SearchAgentRequest
+public class SearchAgentsQuery
+    : Query<IEnumerable<Agent>>
 {
 
     /// <summary>
-    /// Gets the minium amount of agents that can be returned by a search request.
+    /// Gets the minimum amount of agents that can be returned by a search query.
     /// </summary>
     public const int MinimumLimit = 1;
     /// <summary>
-    /// Gets the maximum amount of agents that can be returned by a search request.
+    /// Gets the maximum amount of agents that can be returned by a search query.
     /// </summary>
     public const int MaximumLimit = 1000;
     /// <summary>
-    /// Gets the default amount of agents returned by a search request.
+    /// Gets the default amount of agents returned by a search query.
     /// </summary>
     public const int DefaultLimit = 10;
 
@@ -48,6 +49,6 @@ public record SearchAgentRequest
     /// </summary>
     [Description("The offset to start listing agents from. Defaults to '0'.")]
     [DataMember(Name = "offset", Order = 4), JsonPropertyName("offset"), JsonPropertyOrder(4), YamlMember(Alias = "offset", Order = 4)]
-    public virtual uint Offset { get; set; } = DefaultLimit;
+    public virtual uint Offset { get; set; }
 
 }

@@ -1,0 +1,17 @@
+﻿global using AgentCommunicationProtocol.Models;
+global using AgentCommunicationProtocol.Server;
+global using AgentCommunicationProtocol.Server.Configuration;
+global using AgentCommunicationProtocol.Server.Services;
+global using Microsoft.AspNetCore.Mvc;
+global using Neuroglia;
+global using Neuroglia.Mediation;
+global using Neuroglia.Mediation.AspNetCore;
+global using Neuroglia.Serialization;
+global using Scalar.AspNetCore;
+global using System.Collections.Concurrent;
+global using System.ComponentModel;
+global using System.Net;
+global using System.Text.Json;
+global using System.Text.Json.Serialization;
+global using Microsoft.Extensions.Options;
+global using System.Text;

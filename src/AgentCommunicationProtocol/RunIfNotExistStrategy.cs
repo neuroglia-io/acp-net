@@ -1,17 +1,17 @@
 ﻿namespace AgentCommunicationProtocol;
 
 /// <summary>
-/// Enumerates all supported completion modes
+/// Enumerates all supported strategies that can be used to address the non-existence of a run.
 /// </summary>
 public static class RunIfNotExistStrategy
 {
 
     /// <summary>
-    /// Raises an error if the thread is missing.
+    /// Raises an error if the run is missing.
     /// </summary>
     public const string Reject = "reject";
     /// <summary>
-    /// Creates a new thread.
+    /// Creates a new run.
     /// </summary>
     public const string Create = "create";
 

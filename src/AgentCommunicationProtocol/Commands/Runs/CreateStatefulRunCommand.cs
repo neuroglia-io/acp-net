@@ -1,11 +1,12 @@
-﻿namespace AgentCommunicationProtocol.Models;
+﻿namespace AgentCommunicationProtocol.Commands.Runs;
 
 /// <summary>
-/// Represents the parameters used to create a new agent run.
+/// Represents the command used to create a new stateful run.
 /// </summary>
-[Description("Represents the parameters used to create a new agent run.")]
+[Description("Represents the command used to create a new run.")]
 [DataContract]
-public abstract record AgentRunParameters
+public class CreateStatefulRunCommand
+    : Command
 {
 
     /// <summary>
@@ -44,9 +45,9 @@ public abstract record AgentRunParameters
     public virtual Uri? Webhook { get; set; }
 
     /// <summary>
-    /// Gets/sets the streaming modesto use, if any.
+    /// Gets/sets the streaming modes to use, if any.
     /// </summary>
-    [Description("The streaming modesto use, if any.")]
+    [Description("The streaming modes to use, if any.")]
     [AllowedValues(StreamingMode.Values, StreamingMode.Custom)]
     [DataMember(Name = "stream_mode", Order = 6), JsonPropertyName("stream_mode"), JsonPropertyOrder(6), YamlMember(Alias = "stream_mode", Order = 6)]
     public virtual EquatableList<string>? StreamMode { get; set; }
@@ -62,10 +63,10 @@ public abstract record AgentRunParameters
     /// <summary>
     /// Gets/sets the multitask strategy to use. Defaults to 'reject'.
     /// </summary>
-    [Description("The ultitask strategy to use. Defaults to 'reject'.")]
-    [AllowedValues(AgentCommunicationProtocol.RunMultitaskStrategy.Reject, AgentCommunicationProtocol.RunMultitaskStrategy.Rollback, AgentCommunicationProtocol.RunMultitaskStrategy.Rollback, AgentCommunicationProtocol.RunMultitaskStrategy.Enqueue), DefaultValue(AgentCommunicationProtocol.RunMultitaskStrategy.Reject)]
+    [Description("The multitask strategy to use. Defaults to 'reject'.")]
+    [AllowedValues(RunMultitaskStrategy.Reject, RunMultitaskStrategy.Rollback, RunMultitaskStrategy.Rollback, RunMultitaskStrategy.Enqueue), DefaultValue(RunMultitaskStrategy.Reject)]
     [DataMember(Name = "multitask_strategy", Order = 8), JsonPropertyName("multitask_strategy"), JsonPropertyOrder(8), YamlMember(Alias = "multitask_strategy", Order = 8)]
-    public virtual string MultitaskStrategy { get; set; } = AgentCommunicationProtocol.RunMultitaskStrategy.Reject;
+    public virtual string MultitaskStrategy { get; set; } = RunMultitaskStrategy.Reject;
 
     /// <summary>
     /// Gets/sets the number of seconds, if any, to wait before starting the run. Use to schedule future runs.
@@ -73,5 +74,21 @@ public abstract record AgentRunParameters
     [Description("The number of seconds, if any, to wait before starting the run. Use to schedule future runs.")]
     [DataMember(Name = "after_seconds", Order = 9), JsonPropertyName("after_seconds"), JsonPropertyOrder(9), YamlMember(Alias = "after_seconds", Order = 9)]
     public virtual uint AfterSeconds { get; set; }
+
+    /// <summary>
+    /// Gets/sets a boolean indicating whether to stream output from subgraphs. Defaults to 'false'.
+    /// </summary>
+    [Description("A boolean indicating whether to stream output from subgraphs. Defaults to 'false'.")]
+    [DefaultValue(false)]
+    [DataMember(Name = "stream_subgraphs", Order = 10), JsonPropertyName("stream_subgraphs"), JsonPropertyOrder(10), YamlMember(Alias = "stream_subgraphs", Order = 10)]
+    public virtual bool StreamSubgraphs { get; set; }
+
+    /// <summary>
+    /// Gets/sets the strategy used to handle missing thread. Defaults to 'reject'.
+    /// </summary>
+    [Description("The strategy used to handle missing thread.")]
+    [AllowedValues(RunIfNotExistStrategy.Reject, RunIfNotExistStrategy.Create), DefaultValue(RunIfNotExistStrategy.Reject)]
+    [DataMember(Name = "if_not_exists", Order = 11), JsonPropertyName("if_not_exists"), JsonPropertyOrder(11), YamlMember(Alias = "if_not_exists", Order = 11)]
+    public virtual string IfNotExists { get; set; } = RunIfNotExistStrategy.Reject;
 
 }

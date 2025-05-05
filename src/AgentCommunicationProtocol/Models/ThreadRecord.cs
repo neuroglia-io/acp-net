@@ -1,11 +1,12 @@
 ﻿namespace AgentCommunicationProtocol.Models;
 
 /// <summary>
-/// Represents a collection of consecutive runs over a thread. Thread is associated with a state. Runs for a thread can potentially happen across different agents, if the state format is compatible.
+/// Represents a thread's record.
 /// </summary>
-[Description("Represents a collection of consecutive runs over a thread. Thread is associated with a state. Runs for a thread can potentially happen across different agents, if the state format is compatible.")]
+[Description("Represents a thread's record.")]
 [DataContract]
-public record Thread
+public record ThreadRecord
+    : IThreadRecord
 {
 
     /// <summary>
@@ -14,7 +15,7 @@ public record Thread
     [Description("The thread's unique identifier.")]
     [Required, MinLength(1)]
     [DataMember(Name = "thread_id", Order = 1), JsonPropertyName("thread_id"), JsonPropertyOrder(1), YamlMember(Alias = "thread_id", Order = 1)]
-    public virtual string Id { get; set; } = null!;
+    public virtual required string Id { get; set; }
 
     /// <summary>
     /// Gets or sets the date and time the thread was created at.
@@ -22,7 +23,7 @@ public record Thread
     [Description("The date and time the thread was created at.")]
     [Required]
     [DataMember(Name = "created_at", Order = 2), JsonPropertyName("created_at"), JsonPropertyOrder(2), YamlMember(Alias = "created_at", Order = 2)]
-    public virtual DateTimeOffset CreatedAt { get; set; }
+    public virtual required DateTimeOffset CreatedAt { get; set; }
 
     /// <summary>
     /// Gets or sets the date and time the thread was last updated at.
@@ -30,7 +31,7 @@ public record Thread
     [Description("The date and time the thread was last updated at.")]
     [Required]
     [DataMember(Name = "updated_at", Order = 3), JsonPropertyName("updated_at"), JsonPropertyOrder(3), YamlMember(Alias = "updated_at", Order = 3)]
-    public virtual DateTimeOffset UpdatedAt { get; set; }
+    public virtual required DateTimeOffset UpdatedAt { get; set; }
 
     /// <summary>
     /// Gets or sets the thread's metadata, if any.
@@ -60,5 +61,20 @@ public record Thread
     [Description("The thread's current messages. If messages are contained in 'values', implementations should remove them from values when returning messages. When this key isn't present it means the thread doesn't support messages.")]
     [DataMember(Name = "messages", Order = 7), JsonPropertyName("messages"), JsonPropertyOrder(7), YamlMember(Alias = "messages", Order = 7)]
     public virtual EquatableList<Message>? Messages { get; set; }
+
+    /// <summary>
+    /// Gets or set the thread's current checkpoint.
+    /// </summary>
+    [Description("The thread's current checkpoint.")]
+    [Required]
+    [DataMember(Name = "checkpoint", Order = 8), JsonPropertyName("checkpoint"), JsonPropertyOrder(8), YamlMember(Alias = "checkpoint", Order = 8)]
+    public virtual required ThreadCheckpoint Checkpoint { get; set; } = null!;
+
+    IReadOnlyDictionary<string, object>? IThreadRecord.Metadata => Metadata?.AsReadOnly();
+
+    IReadOnlyDictionary<string, object>? IThreadRecord.Values => Values?.AsReadOnly();
+
+    IReadOnlyList<Message>? IThreadRecord.Messages => Messages?.AsReadOnly();
+
 
 }

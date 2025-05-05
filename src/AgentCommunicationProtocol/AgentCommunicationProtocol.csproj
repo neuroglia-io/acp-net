@@ -26,8 +26,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+  	<None Include="..\..\README.md">
+  		<Pack>True</Pack>
+  		<PackagePath>\</PackagePath>
+  	</None>
+  </ItemGroup>
+	
+  <ItemGroup>
     <PackageReference Include="JsonSchema.Net" Version="7.3.4" />
-    <PackageReference Include="Neuroglia.Core" Version="4.21.0" />
+    <PackageReference Include="Neuroglia.Mediation" Version="4.21.0" />
+    <PackageReference Include="Semver" Version="3.0.0" />
     <PackageReference Include="YamlDotNet" Version="16.3.0" />
   </ItemGroup>
 

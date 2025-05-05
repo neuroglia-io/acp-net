@@ -1,23 +1,24 @@
-﻿namespace AgentCommunicationProtocol.Requests;
+﻿namespace AgentCommunicationProtocol.Queries.Threads;
 
 /// <summary>
-/// Represents the request used to search for threads.
+/// Represents the query used to search for threads.
 /// </summary>
-[Description("Represents the request used to search for threads.")]
+[Description("Represents the query used to search for threads.")]
 [DataContract]
-public record SearchThreadRequest
+public class SearchThreadQuery
+    : Query<IEnumerable<Models.Thread>>
 {
 
     /// <summary>
-    /// Gets the minium amount of threads that can be returned by a search request.
+    /// Gets the minimum amount of threads that can be returned by a search query.
     /// </summary>
     public const int MinimumLimit = 1;
     /// <summary>
-    /// Gets the maximum amount of threads that can be returned by a search request.
+    /// Gets the maximum amount of threads that can be returned by a search query.
     /// </summary>
     public const int MaximumLimit = 1000;
     /// <summary>
-    /// Gets the default amount of threads returned by a search request.
+    /// Gets the default amount of threads returned by a search query.
     /// </summary>
     public const int DefaultLimit = 10;
 
@@ -39,7 +40,7 @@ public record SearchThreadRequest
     /// Gets/sets the status, if any, to filter threads by.
     /// </summary>
     [Description("The status, if any, to filter threads by.")]
-    [AllowedValues(ThreadStatus.Busy, ThreadStatus.Error, ThreadStatus.Idle, ThreadStatus.Interrupted)]
+    [AllowedValues(null, ThreadStatus.Busy, ThreadStatus.Error, ThreadStatus.Idle, ThreadStatus.Interrupted)]
     [DataMember(Name = "status", Order = 3), JsonPropertyName("status"), JsonPropertyOrder(3), YamlMember(Alias = "status", Order = 3)]
     public virtual string? Status { get; set; }
 
@@ -56,6 +57,6 @@ public record SearchThreadRequest
     /// </summary>
     [Description("The offset to start listing threads from. Defaults to '0'.")]
     [DataMember(Name = "offset", Order = 4), JsonPropertyName("offset"), JsonPropertyOrder(4), YamlMember(Alias = "offset", Order = 4)]
-    public virtual uint Offset { get; set; } = DefaultLimit;
+    public virtual uint Offset { get; set; }
 
 }
