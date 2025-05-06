@@ -5,7 +5,6 @@ builder.Services.AddMediator(options =>
 {
     options.ScanAssembly(typeof(AgentCommunicationProtocol.Server.Commands.Threads.CreateThreadCommandHandler).Assembly);
 });
-builder.Services.AddSingleton<IAgentRegistry, AgentRegistry>();
 builder.Services.AddRouting(options =>
 {
     options.LowercaseUrls = true;

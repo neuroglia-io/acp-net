@@ -13,8 +13,8 @@ public sealed class CreateThreadCommandHandler(IThreadStore threadManager)
     /// <inheritdoc/>
     public async Task<IOperationResult<Models.Thread>> HandleAsync(CreateThreadCommand command, CancellationToken cancellationToken = default)
     {
-        var thread = await threadManager.CreateAsync(command.ThreadId, command.Metadata, command.IfExists, cancellationToken).ConfigureAwait(false);
-        return this.Ok(thread.AsThread());
+        var record = await threadManager.CreateAsync(command.ThreadId, command.Metadata, command.IfExists, cancellationToken).ConfigureAwait(false);
+        return this.Ok(record.AsThread());
     }
 
 }

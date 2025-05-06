@@ -12,7 +12,7 @@ public static class IServiceCollectionExtensions
     /// <param name="services">The <see cref="IServiceCollection"/> to configure</param>
     /// <param name="setup">An <see cref="Action{T}"/> used to setup the server</param>
     /// <returns>The configured <see cref="IServiceCollection"/></returns>
-    public static IServiceCollection AddAcpServer(this IServiceCollection services, Action<AcpServerBuilder> setup)
+    public static IServiceCollection AddAcpServer(this IServiceCollection services, Action<IAcpServerBuilder> setup)
     {
         ArgumentNullException.ThrowIfNull(setup);
         services.AddSerialization();

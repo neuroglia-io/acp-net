@@ -13,8 +13,8 @@ public sealed class PatchThreadCommandHandler(IThreadStore threadManager)
     /// <inheritdoc/>
     public async Task<IOperationResult<Models.Thread>> HandleAsync(PatchThreadCommand command, CancellationToken cancellationToken = default)
     {
-        var thread = await threadManager.PatchAsync(command.ThreadId, command.State, cancellationToken).ConfigureAwait(false);
-        return this.Ok(thread.AsThread());
+        var record = await threadManager.SetStateAsync(command.ThreadId, command.State, cancellationToken).ConfigureAwait(false);
+        return this.Ok(record.AsThread());
     }
 
 }

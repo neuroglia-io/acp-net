@@ -1,5 +1,4 @@
-﻿
-namespace AgentCommunicationProtocol.Server.Services;
+﻿namespace AgentCommunicationProtocol.Server.Services;
 
 /// <summary>
 /// Represents the default implementation of the <see cref="IAgentRegistry"/> interface
@@ -14,16 +13,18 @@ public class AgentRegistry
     protected ConcurrentDictionary<string, AgentRecord> Agents { get; } = [];
 
     /// <inheritdoc/>
-    public virtual void Register(AgentMetadata metadata, AgentSpecs specs)
+    public virtual void Register(AgentMetadata metadata, AgentSpecs specs, AgentRuntimeFactoryDelegate runtimeFactory)
     {
         ArgumentNullException.ThrowIfNull(metadata);
         ArgumentNullException.ThrowIfNull(specs);
+        ArgumentNullException.ThrowIfNull(runtimeFactory);
         if (Agents.Any(a => a.Value.Metadata.Ref.Name == metadata.Ref.Name && a.Value.Metadata.Ref.Version == metadata.Ref.Version)) throw new ProblemDetailsException(Problems.AgentNotFound(metadata.Ref.ToString()));
         var record = new AgentRecord()
         {
             Id = Guid.NewGuid().ToString("N"),
             Metadata = metadata,
-            Specs = specs
+            Specs = specs,
+            RuntimeFactory = runtimeFactory
         };
         Agents.AddOrUpdate(record.Id, record, (existing, key) => record);
     }

@@ -1,11 +1,11 @@
 ﻿namespace AgentCommunicationProtocol.Models;
 
 /// <summary>
-/// Represents an object used to describe an agent's run.
+/// Represents an object used to describe an agent run.
 /// </summary>
 [Description("Represents an object used to describe an agent's run.")]
 [DataContract]
-public record AgentRun
+public record Run
 {
 
     /// <summary>
@@ -14,10 +14,10 @@ public record AgentRun
     [Description("The run's unique identifier.")]
     [Required, MinLength(1)]
     [DataMember(Name = "run_id", Order = 1), JsonPropertyName("run_id"), JsonPropertyOrder(1), YamlMember(Alias = "run_id", Order = 1)]
-    public virtual string Id { get; set; } = null!;
+    public virtual required string Id { get; set; } = null!;
 
     /// <summary>
-    /// Gets or sets the ique identifier of the thread, if any, the run belongs to.
+    /// Gets or sets the unique identifier of the thread, if any, the run belongs to.
     /// </summary>
     [Description("The unique identifier of the thread, if any, the run belongs to.")]
     [DataMember(Name = "thread_id", Order = 2), JsonPropertyName("thread_id"), JsonPropertyOrder(2), YamlMember(Alias = "thread_id", Order = 2)]
@@ -29,7 +29,7 @@ public record AgentRun
     [Description("The unique identifier of the agent the run concerns.")]
     [Required, MinLength(1)]
     [DataMember(Name = "agent_id", Order = 3), JsonPropertyName("agent_id"), JsonPropertyOrder(3), YamlMember(Alias = "agent_id", Order = 3)]
-    public virtual string AgentId { get; set; } = null!;
+    public virtual required string AgentId { get; set; } = null!;
 
     /// <summary>
     /// Gets or sets the date and time the run was created at.
@@ -37,7 +37,7 @@ public record AgentRun
     [Description("The date and time the run was created at.")]
     [Required]
     [DataMember(Name = "created_at", Order = 4), JsonPropertyName("created_at"), JsonPropertyOrder(4), YamlMember(Alias = "created_at", Order = 4)]
-    public virtual DateTimeOffset CreatedAt { get; set; }
+    public virtual required DateTimeOffset CreatedAt { get; set; }
 
     /// <summary>
     /// Gets or sets the date and time the run was last updated at.
@@ -45,7 +45,7 @@ public record AgentRun
     [Description("The date and time the run was last updated at.")]
     [Required]
     [DataMember(Name = "updated_at", Order = 5), JsonPropertyName("updated_at"), JsonPropertyOrder(5), YamlMember(Alias = "updated_at", Order = 5)]
-    public virtual DateTimeOffset UpdatedAt { get; set; }
+    public virtual required DateTimeOffset UpdatedAt { get; set; }
 
     /// <summary>
     /// Gets or sets the run's status.

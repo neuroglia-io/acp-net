@@ -1,7 +1,7 @@
 ﻿namespace AgentCommunicationProtocol;
 
 /// <summary>
-/// Defines the fundamentals of a thread record
+/// Defines the fundamentals of a thread record.
 /// </summary>
 public interface IThreadRecord
 {

@@ -11,7 +11,8 @@ public interface IAgentRegistry
     /// </summary>
     /// <param name="metadata">The metadata used to describe the agent to register.</param>
     /// <param name="specs">The specs of the agent to register.</param>
-    void Register(AgentMetadata metadata, AgentSpecs specs);
+    /// <param name="runtimeFactory">The delegate function used to create the agent's <see cref="IAgentRuntime"/>.</param>
+    void Register(AgentMetadata metadata, AgentSpecs specs, AgentRuntimeFactoryDelegate runtimeFactory);
 
     /// <summary>
     /// Deregisters the specified agent.

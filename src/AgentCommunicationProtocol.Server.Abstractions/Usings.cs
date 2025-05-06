@@ -1,4 +1,5 @@
 ﻿global using AgentCommunicationProtocol.Models;
-global using Neuroglia;
-global using System.Reactive.Subjects;
+global using AgentCommunicationProtocol.Server.Services;
 global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.Hosting;
+global using Neuroglia;

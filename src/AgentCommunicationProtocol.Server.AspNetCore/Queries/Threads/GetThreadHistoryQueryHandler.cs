@@ -13,8 +13,8 @@ public sealed class GetThreadHistoryQueryHandler(IThreadStore threadManager)
     /// <inheritdoc/>
     public async Task<IOperationResult<Models.ThreadState>> HandleAsync(GetThreadHistoryQuery query, CancellationToken cancellationToken = default)
     {
-        var thread = await threadManager.GetAsync(query.Id, cancellationToken).ConfigureAwait(false) ?? throw new ProblemDetailsException(Problems.ThreadNotFound(query.Id));
-        return this.Ok(thread.GetState());
+        var record = await threadManager.GetAsync(query.Id, cancellationToken).ConfigureAwait(false) ?? throw new ProblemDetailsException(Problems.ThreadNotFound(query.Id));
+        return this.Ok(record.GetState());
     }
 
 }

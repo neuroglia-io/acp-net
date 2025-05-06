@@ -1,5 +1,4 @@
-﻿using AgentCommunicationProtocol.Commands.Runs;
-using AgentCommunicationProtocol.Commands.Threads;
+﻿using AgentCommunicationProtocol.Commands.Threads;
 using AgentCommunicationProtocol.Queries.Threads;
 
 namespace AgentCommunicationProtocol.Server.Controllers;
@@ -143,9 +142,9 @@ public class ThreadsController(IMediator mediator, IOptions<JsonOptions> jsonOpt
     /// <param name="limit">The limit, if any, of runs to list. Defaults to '1000'.</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
     /// <returns>A new <see cref="IActionResult"/> used to describe the result of the operation.</returns>
-    [HttpGet("{id}/runs")]
+    [HttpGet("{id}/runs", Name = "List Thread Runs")]
     [EndpointName("List Thread Runs"), EndpointDescription("Lists the specified thread's runs.")]
-    [ProducesResponseType(typeof(IEnumerable<AgentRun>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(IEnumerable<StatefulRun>), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     [ProducesResponseType((int)HttpStatusCode.UnprocessableEntity)]
     public async Task<IActionResult> ListThreadRunsAsync([Description("The id of the thread to list the runs of.")] string id, [Description("The offset, if any, to start listing runs from. Defaults to '0'.")] uint offset = 0, [Description("The limit, if any, of runs to list. Defaults to '1000'.")] uint limit = ListThreadRunsQuery.DefaultLimit, CancellationToken cancellationToken = default)
@@ -157,47 +156,70 @@ public class ThreadsController(IMediator mediator, IOptions<JsonOptions> jsonOpt
             Offset = offset,
             Limit = limit
         }, cancellationToken).ConfigureAwait(false);
-        return this.Process(result, (int)HttpStatusCode.NoContent);
+        return this.Process(result);
+    }
+
+    /// <summary>
+    /// Gets the specified run.
+    /// </summary>
+    /// <param name="threadId">The unique identifier of the thread the run to get belongs to.</param>
+    /// <param name="runId">The unique identifier of the run to ge</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    /// <returns>A new <see cref="IActionResult"/> used to describe the result of the operation.</returns>
+    [HttpGet("{threadId}/runs/{runId}", Name = "Get Run")]
+    [EndpointName("Get Run"), EndpointDescription("Gets the specified run.")]
+    [ProducesResponseType(typeof(StatefulRun), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
+    [ProducesResponseType((int)HttpStatusCode.UnprocessableEntity)]
+    public async Task<IActionResult> GetThreadRunAsync([Description("The unique identifier of the thread the run to get belongs to.")] string threadId, [Description("The unique identifier of the run to ge.")] string runId, CancellationToken cancellationToken = default)
+    {
+        if (!ModelState.IsValid) return ValidationProblem(ModelState);
+        var result = await mediator.ExecuteAsync(new GetThreadRunQuery()
+        {
+            ThreadId = threadId,
+            RunId = runId
+        }, cancellationToken).ConfigureAwait(false);
+        return this.Process(result);
     }
 
     /// <summary>
     /// Creates a run on the specified thread and return the run its ID immediately. Don't wait for the final run output.
     /// </summary>
     /// <param name="id">The id of the thread on which to create a new run.</param>
-    /// <param name="command">The command that defines the run to create.</param>
+    /// <param name="options">The options used to configure the run to create.</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
     /// <returns>A new <see cref="IActionResult"/> used to describe the result of the operation.</returns>
-    [HttpPost("{id}/runs")]
+    [HttpPost("{id}/runs", Name = "Create Background Thread Run")]
     [EndpointName("Create Background Thread Run"), EndpointDescription("Creates a run on the specified thread and return the run its ID immediately. Don't wait for the final run output.")]
-    [ProducesResponseType(typeof(StatefulAgentRun), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(StatefulRun), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     [ProducesResponseType((int)HttpStatusCode.Conflict)]
     [ProducesResponseType((int)HttpStatusCode.UnprocessableEntity)]
-    public async Task<IActionResult> CreateBackgroundRunAsync([Description("The id of the thread on which to create a new run.")] string id, [FromBody, Description("The command that defines the run to create")] CreateStatefulRunCommand command, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> CreateBackgroundRunAsync([Description("The id of the thread on which to create a new run.")] string id, [FromBody, Description("The options used to configure the run to create.")] StatefulRunCreationOptions options, CancellationToken cancellationToken = default)
     {
         if (!ModelState.IsValid) return ValidationProblem(ModelState);
         var result = await mediator.ExecuteAsync(new CreateThreadBackgroundRunCommand()
         {
             ThreadId = id,
-            Run = command
+            Options = options
         }, cancellationToken).ConfigureAwait(false);
-        return this.Process(result, (int)HttpStatusCode.NoContent);
+        return this.Process(result);
     }
 
     /// <summary>
     /// Creates a run on the specified thread and streams its output.
     /// </summary>
     /// <param name="id">The id of the thread on which to create a new run.</param>
-    /// <param name="command">The command that defines the run to create.</param>
+    /// <param name="options">The options used to configure the run to create.</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
     /// <returns>A new awaitable <see cref="Task"/>.</returns>
-    [HttpPost("{id}/runs/stream")]
+    [HttpPost("{id}/runs/stream", Name = "Create And Stream Thread Run")]
     [EndpointName("Create And Stream Thread Run"), EndpointDescription("Creates a run on the specified thread and streams its output.")]
-    [ProducesResponseType(typeof(IEnumerable<RunResultUpdate>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(IEnumerable<RunOutputStreamEvent>), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     [ProducesResponseType((int)HttpStatusCode.Conflict)]
     [ProducesResponseType((int)HttpStatusCode.UnprocessableEntity)]
-    public async Task CreateAndStreamRunAsync([Description("The id of the thread on which to create a new run.")] string id, [FromBody, Description("The command that defines the run to create")] CreateStatefulRunCommand command, CancellationToken cancellationToken = default)
+    public async Task CreateAndStreamRunAsync([Description("The id of the thread on which to create a new run.")] string id, [FromBody, Description("The options used to configure the run to create.")] StatefulRunCreationOptions options, CancellationToken cancellationToken = default)
     {
         if (!ModelState.IsValid)
         {
@@ -208,7 +230,7 @@ public class ThreadsController(IMediator mediator, IOptions<JsonOptions> jsonOpt
         var result = await mediator.ExecuteAsync(new CreateAndStreamThreadRunCommand()
         {
             ThreadId = id,
-            Run = command
+            Options = options
         }, cancellationToken).ConfigureAwait(false);
         if (!result.IsSuccess())
         {
@@ -219,41 +241,148 @@ public class ThreadsController(IMediator mediator, IOptions<JsonOptions> jsonOpt
         Response.Headers.ContentType = "text/event-stream";
         Response.Headers.CacheControl = "no-cache";
         Response.Headers.Connection = "keep-alive";
-        Response.Headers["X-Response-Id"] = result.Data!.Id;
         await Response.Body.FlushAsync(cancellationToken).ConfigureAwait(false);
         try
         {
-            await foreach (var e in result.Data!.Stream.WithCancellation(cancellationToken))
+            await foreach (var e in result.Data!.WithCancellation(cancellationToken))
             {
-                var sseMessage = $"data: {jsonSerializer.SerializeToText(e)}\n\n";
-                await Response.Body.WriteAsync(Encoding.UTF8.GetBytes(sseMessage), cancellationToken).ConfigureAwait(false);
+                var sse = new StringBuilder()
+                    .Append($"id: {e.Id}\n")
+                    .Append($"event: {e.Event}\n")
+                    .Append($"data: {JsonSerializer.Serialize(e.Data, jsonOptions.Value.JsonSerializerOptions)}\n\n")
+                    .ToString();
+                await Response.Body.WriteAsync(Encoding.UTF8.GetBytes(sse), cancellationToken).ConfigureAwait(false);
                 await Response.Body.FlushAsync(cancellationToken).ConfigureAwait(false);
             }
         }
         catch (Exception ex) when (ex is TaskCanceledException || ex is OperationCanceledException) { }
-        return this.Process(result, (int)HttpStatusCode.NoContent);
     }
 
     /// <summary>
     /// Creates a run on the specified thread and wait for its output.
     /// </summary>
     /// <param name="id">The id of the thread on which to create a new run.</param>
-    /// <param name="command">The command that defines the run to create.</param>
+    /// <param name="options">The options used to configure the run to create</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
     /// <returns>A new <see cref="IActionResult"/> used to describe the result of the operation.</returns>
-    [HttpPost("{id}/runs/wait")]
+    [HttpPost("{id}/runs/wait", Name = "Create And Wait Thread Run")]
     [EndpointName("Create And Wait Thread Run"), EndpointDescription("Creates a run on the specified thread and wait for its output.")]
-    [ProducesResponseType(typeof(StatefulAgentRun), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(StatefulRunExecutionResult), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     [ProducesResponseType((int)HttpStatusCode.Conflict)]
     [ProducesResponseType((int)HttpStatusCode.UnprocessableEntity)]
-    public async Task<IActionResult> CreateAndWaitRunAsync([Description("The id of the thread on which to create a new run.")] string id, [FromBody, Description("The command that defines the run to create")] CreateStatefulRunCommand command, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> CreateAndWaitRunAsync([Description("The id of the thread on which to create a new run.")] string id, [FromBody, Description("The options used to configure the run to create.")] StatefulRunCreationOptions options, CancellationToken cancellationToken = default)
     {
         if (!ModelState.IsValid) return ValidationProblem(ModelState);
-        var result = await mediator.ExecuteAsync(new CreateAndStreamThreadRunCommand()
+        var result = await mediator.ExecuteAsync(new CreateAndWaitThreadRunCommand()
         {
             ThreadId = id,
-            Run = command
+            Options = options
+        }, cancellationToken).ConfigureAwait(false);
+        return this.Process(result);
+    }
+
+    /// <summary>
+    /// Resumes an interrupted run.
+    /// </summary>
+    /// <param name="threadId">The unique identifier of the thread the run to resume belongs to.</param>
+    /// <param name="runId">The unique identifier of the run to resume.</param>
+    /// <param name="payload">The interrupt's payload.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    /// <returns>A new <see cref="IActionResult"/> used to describe the result of the operation.</returns>
+    [HttpPost("{threadId}/runs/{runId}", Name = "Resume Run")]
+    [EndpointName("Resume Run"), EndpointDescription("Resumes an interrupted run.")]
+    [ProducesResponseType(typeof(StatefulRunExecutionResult), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
+    [ProducesResponseType((int)HttpStatusCode.Conflict)]
+    [ProducesResponseType((int)HttpStatusCode.UnprocessableEntity)]
+    public async Task<IActionResult> ResumeRunAsync([Description("The unique identifier of the thread the run to resume belongs to.")] string threadId, [Description("The unique identifier of the run to resume.")] string runId, [FromBody, Description("The interrupt's payload.")] object payload, CancellationToken cancellationToken = default)
+    {
+        if (!ModelState.IsValid) return ValidationProblem(ModelState);
+        var result = await mediator.ExecuteAsync(new ResumeThreadRunCommand()
+        {
+            ThreadId = threadId,
+            RunId = runId,
+            Payload = payload
+        }, cancellationToken).ConfigureAwait(false);
+        return this.Process(result);
+    }
+
+    /// <summary>
+    /// Streams the output of a pending run.
+    /// </summary>
+    /// <param name="threadId">The unique identifier of the thread the run to stream the output of belongs to.</param>
+    /// <param name="runId">The unique identifier of the run to stream the output of.</param>
+    /// <param name="payload">The interrupt's payload.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    /// <returns>A new awaitable <see cref="Task"/>.</returns>
+    [HttpGet("{threadId}/runs/{runId}/stream", Name = "Stream Run Output")]
+    [EndpointName("Stream Run Output"), EndpointDescription("Streams the output of a pending run.")]
+    [ProducesResponseType(typeof(IEnumerable<RunOutputStreamEvent>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
+    [ProducesResponseType((int)HttpStatusCode.UnprocessableEntity)]
+    public async Task StreamRunOutputAsync([Description("The unique identifier of the thread the run to stream the output of belongs to.")] string threadId, [Description("The unique identifier of the run to stream the output of.")] string runId, CancellationToken cancellationToken = default)
+    {
+        if (!ModelState.IsValid)
+        {
+            Response.StatusCode = (int)HttpStatusCode.BadRequest;
+            await JsonSerializer.SerializeAsync(Response.Body, ProblemDetailsFactory.CreateValidationProblemDetails(HttpContext, ModelState), jsonOptions.Value.JsonSerializerOptions, cancellationToken);
+            return;
+        }
+        var result = await mediator.ExecuteAsync(new StreamThreadRunOutputCommand()
+        {
+            ThreadId = threadId,
+            RunId = runId
+        }, cancellationToken).ConfigureAwait(false);
+        if (!result.IsSuccess())
+        {
+            Response.StatusCode = result.Status;
+            await JsonSerializer.SerializeAsync(Response.Body, ProblemDetailsFactory.CreateProblemDetails(HttpContext), jsonOptions.Value.JsonSerializerOptions, cancellationToken);
+            return;
+        }
+        Response.Headers.ContentType = "text/event-stream";
+        Response.Headers.CacheControl = "no-cache";
+        Response.Headers.Connection = "keep-alive";
+        await Response.Body.FlushAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await foreach (var e in result.Data!.WithCancellation(cancellationToken))
+            {
+                var sse = new StringBuilder()
+                    .Append($"id: {e.Id}\n")
+                    .Append($"event: {e.Event}\n")
+                    .Append($"data: {JsonSerializer.Serialize(e.Data, jsonOptions.Value.JsonSerializerOptions)}\n\n")
+                    .ToString();
+                await Response.Body.WriteAsync(Encoding.UTF8.GetBytes(sse), cancellationToken).ConfigureAwait(false);
+                await Response.Body.FlushAsync(cancellationToken).ConfigureAwait(false);
+            }
+        }
+        catch (Exception ex) when (ex is TaskCanceledException || ex is OperationCanceledException) { }
+    }
+
+    /// <summary>
+    /// Cancels a pending run.
+    /// </summary>
+    /// <param name="threadId">The unique identifier of the thread the run to cancel belongs to.</param>
+    /// <param name="runId">The unique identifier of the run to cancel.</param>
+    /// <param name="wait">Indicates whether to wait for the run's cancellation.</param>
+    /// <param name="action">The action to take when cancelling the run. Possible values are 'interrupt' or 'rollback'. 'interrupt' will simply cancel the run. 'rollback' will cancel the run and delete the run and associated checkpoints afterwards.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/>.</param>
+    /// <returns>A new <see cref="IActionResult"/> used to describe the result of the operation.</returns>
+    [HttpPost("{threadId}/runs/{runId}/cancel", Name = "Cancel Run")]
+    [EndpointName("Cancel Run"), EndpointDescription("Cancels a pending run.")]
+    [ProducesResponseType((int)HttpStatusCode.NoContent)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
+    [ProducesResponseType((int)HttpStatusCode.UnprocessableEntity)]
+    public async Task<IActionResult> CancelRunAsync([Description("The unique identifier of the thread the run to cancel belongs to.")] string threadId, [Description("The unique identifier of the run to cancel.")] string runId, [Description("Indicates whether to wait for the run's cancellation.")] bool wait = false, [Description("The action to take when cancelling the run. Possible values are 'interrupt' or 'rollback'. 'interrupt' will simply cancel the run. 'rollback' will cancel the run and delete the run and associated checkpoints afterwards.")] string action = RunCancellationAction.Interrupt, CancellationToken cancellationToken = default)
+    {
+        if (!ModelState.IsValid) return ValidationProblem(ModelState);
+        var result = await mediator.ExecuteAsync(new CancelThreadRunCommand()
+        {
+            ThreadId = threadId,
+            RunId = runId,
+            Wait = wait,
+            Action = action
         }, cancellationToken).ConfigureAwait(false);
         return this.Process(result, (int)HttpStatusCode.NoContent);
     }

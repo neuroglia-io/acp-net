@@ -6,7 +6,7 @@
 [Description("Represents the query used to list the runs that belong to a specified thread.")]
 [DataContract]
 public class ListThreadRunsQuery
-    : Query<IEnumerable<AgentRun>>
+    : Query<IEnumerable<StatefulRun>>
 {
 
     /// <summary>

@@ -1,4 +1,4 @@
-﻿namespace AgentCommunicationProtocol;
+﻿namespace AgentCommunicationProtocol.Server;
 
 /// <summary>
 /// Defines the fundamentals of an agent record
@@ -22,9 +22,14 @@ public interface IAgentRecord
     AgentSpecs Specs { get; }
 
     /// <summary>
-    /// Converts the <see cref="AgentRecord"/> into a new <see cref="Agent"/>
+    /// Gets the delegate function used to create the agent's <see cref="IAgentRuntime"/>.
     /// </summary>
-    /// <returns>A new <see cref="Agent"/></returns>
+    AgentRuntimeFactoryDelegate RuntimeFactory { get; }
+
+    /// <summary>
+    /// Converts the <see cref="AgentRecord"/> into a new <see cref="Agent"/>.
+    /// </summary>
+    /// <returns>A new <see cref="Agent"/>.</returns>
     Agent AsAgent() => new()
     {
         Id = Id,
@@ -32,9 +37,9 @@ public interface IAgentRecord
     };
 
     /// <summary>
-    /// Converts the <see cref="AgentRecord"/> into a new <see cref="AgentDescriptor"/>
+    /// Converts the <see cref="AgentRecord"/> into a new <see cref="AgentDescriptor"/>.
     /// </summary>
-    /// <returns>A new <see cref="AgentDescriptor"/></returns>
+    /// <returns>A new <see cref="AgentDescriptor"/>.</returns>
     AgentDescriptor AsDescriptor() => new()
     {
         Metadata = Metadata,

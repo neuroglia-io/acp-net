@@ -1,6 +1,4 @@
-﻿using AgentCommunicationProtocol.Commands.Runs;
-
-namespace AgentCommunicationProtocol.Commands.Threads;
+﻿namespace AgentCommunicationProtocol.Commands.Threads;
 
 /// <summary>
 /// Represents the command used to create a run on a thread and to stream its output.
@@ -8,7 +6,7 @@ namespace AgentCommunicationProtocol.Commands.Threads;
 [Description("Represents the command used to create a run on a thread and to stream its output.")]
 [DataContract]
 public class CreateAndStreamThreadRunCommand
-    : Command<IAsyncEnumerable<RunResultUpdate>>
+    : Command<IAsyncEnumerable<RunOutputStreamEvent>>
 {
 
     /// <summary>
@@ -20,11 +18,11 @@ public class CreateAndStreamThreadRunCommand
     public virtual required string ThreadId { get; set; }
 
     /// <summary>
-    /// Gets or sets the command that defines the run to create on the thread.
+    /// Gets or sets the options used to configure the run to create.
     /// </summary>
-    [Description("The unique identifier of the thread to create a new run for.")]
+    [Description("The options used to configure the run to create.")]
     [Required]
-    [DataMember(Name = "run", Order = 2), JsonPropertyName("run"), JsonPropertyOrder(2), YamlMember(Alias = "run", Order = 2)]
-    public virtual required CreateStatefulRunCommand Run { get; set; }
+    [DataMember(Name = "options", Order = 2), JsonPropertyName("options"), JsonPropertyOrder(2), YamlMember(Alias = "options", Order = 2)]
+    public virtual required StatefulRunCreationOptions Options { get; set; }
 
 }

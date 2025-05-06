@@ -1,12 +1,11 @@
-﻿namespace AgentCommunicationProtocol.Commands.Runs;
+﻿namespace AgentCommunicationProtocol.Models;
 
 /// <summary>
-/// Represents the command used to create a new stateful run.
+/// Represents the options used to create a new run.
 /// </summary>
-[Description("Represents the command used to create a new run.")]
+[Description("Represents the options used to create a new run.")]
 [DataContract]
-public class CreateStatefulRunCommand
-    : Command
+public abstract record RunCreationOptions
 {
 
     /// <summary>
@@ -21,7 +20,7 @@ public class CreateStatefulRunCommand
     /// </summary>
     [Description("The agent's input. The schema is described in agent ACP descriptor under 'spec.thread_state.input'.")]
     [DataMember(Name = "input", Order = 2), JsonPropertyName("input"), JsonPropertyOrder(2), YamlMember(Alias = "input", Order = 2)]
-    public virtual EquatableDictionary<string, object>? Input { get; set; }
+    public virtual object? Input { get; set; }
 
     /// <summary>
     /// Gets/sets a key/value mapping of the run's metadata, if any.
@@ -74,21 +73,5 @@ public class CreateStatefulRunCommand
     [Description("The number of seconds, if any, to wait before starting the run. Use to schedule future runs.")]
     [DataMember(Name = "after_seconds", Order = 9), JsonPropertyName("after_seconds"), JsonPropertyOrder(9), YamlMember(Alias = "after_seconds", Order = 9)]
     public virtual uint AfterSeconds { get; set; }
-
-    /// <summary>
-    /// Gets/sets a boolean indicating whether to stream output from subgraphs. Defaults to 'false'.
-    /// </summary>
-    [Description("A boolean indicating whether to stream output from subgraphs. Defaults to 'false'.")]
-    [DefaultValue(false)]
-    [DataMember(Name = "stream_subgraphs", Order = 10), JsonPropertyName("stream_subgraphs"), JsonPropertyOrder(10), YamlMember(Alias = "stream_subgraphs", Order = 10)]
-    public virtual bool StreamSubgraphs { get; set; }
-
-    /// <summary>
-    /// Gets/sets the strategy used to handle missing thread. Defaults to 'reject'.
-    /// </summary>
-    [Description("The strategy used to handle missing thread.")]
-    [AllowedValues(RunIfNotExistStrategy.Reject, RunIfNotExistStrategy.Create), DefaultValue(RunIfNotExistStrategy.Reject)]
-    [DataMember(Name = "if_not_exists", Order = 11), JsonPropertyName("if_not_exists"), JsonPropertyOrder(11), YamlMember(Alias = "if_not_exists", Order = 11)]
-    public virtual string IfNotExists { get; set; } = RunIfNotExistStrategy.Reject;
 
 }
